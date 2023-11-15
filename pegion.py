@@ -8,6 +8,15 @@ import math
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
 mp_lm = mp_pose.PoseLandmark
+font_path = r"C:\Users\napat\Documents\GitHub\Muscleman\Material\Outfit-Bold.ttf"
+good = cv2.imread(r"C:\Users\napat\Documents\GitHub\Muscleman\image\good.png", cv2.IMREAD_UNCHANGED)
+turtle = cv2.imread(r"C:\Users\napat\Documents\GitHub\Muscleman\image\turtle.png", cv2.IMREAD_UNCHANGED)
+rabbit = cv2.imread(r"C:\Users\napat\Documents\GitHub\Muscleman\image\rabbit.png", cv2.IMREAD_UNCHANGED)
+    # # Draw turtle
+turtle = cv2.resize(turtle, (70, 65))
+good = cv2.resize(good, (55, 55))
+rabbit = cv2.resize(rabbit, (80, 80))
+# Percent = 0
 
 def create_gradient_background(width, height, color1, color2):
     gradient_background = np.zeros((height, width, 3), dtype=np.uint8)
@@ -64,31 +73,32 @@ def calculate_angle(a,b,c):
         
     return angle
 
-def disp(result_image,ex_name, L_counter, R_counter, er_1,er_2,er_3,start_time,velo):
-    font_path = r"C:\Users\TADTAWAN\Desktop\work\studio\Outfit-Bold.ttf"
-    good = cv2.imread(r"C:\Users\TADTAWAN\Desktop\work\studio\code1\good.png", cv2.IMREAD_UNCHANGED)
-    turtle = cv2.imread(r"C:\Users\TADTAWAN\Desktop\work\studio\code1\turtle.png", cv2.IMREAD_UNCHANGED)
-    rabbit = cv2.imread(r"C:\Users\TADTAWAN\Desktop\work\studio\code1\rabbit.png", cv2.IMREAD_UNCHANGED)
+def disp(result_image,ex_name, L_counter, R_counter, er_1,er_2,er_3,start_time,velo,Percent):
     font = ImageFont.truetype(font_path, size=48)
     font2 = ImageFont.truetype(font_path, size=72)
     font3 = ImageFont.truetype(font_path, size=32)
 
-    # Draw circle 
-    draw_half_circle_no_round(result_image,100,(330,80),60,(97,49,6))
-    draw_half_circle_no_round(result_image,velo,(115,80),60,(82,25,7))
     cv2.circle(result_image,(1000,255),37,(149,131,8),-1)
-
-    # Draw turtle
-    turtle = cv2.resize(turtle, (70, 65))
-    good = cv2.resize(good, (55, 55))
-    rabbit = cv2.resize(rabbit, (80, 80))
-    height, width, channels = turtle.shape
     x_position = 290  # Adjust this as needed
     y_position =37  # Adjust this as needed
+    current = int(time.time() - start_time)
+    if velo > 50 :
+        img = rabbit
+        color_velo = (0,155,255)
+    elif velo <10:
+        img = turtle
+        color_velo = (0,155,255)
+    else :
+        img = good
+        color_velo = (159,162,53)
+    draw_half_circle_no_round(result_image,100,(330,80),60,color_velo,(97,49,6))
+    draw_half_circle_no_round(result_image,Percent,(115,80),60,(159,162,53),(82,25,7))
+    height, width, channels = img.shape
     roi = result_image[y_position:y_position+height, x_position:x_position+width]
     for c in range(0, 3):
-        roi[:, :, c] = roi[:, :, c] * (1 - turtle[:, :, 3] / 255.0) + turtle[:, :, c] * (turtle[:, :, 3] / 255.0)
-
+        roi[:, :, c] = roi[:, :, c] * (1 - img[:, :, 3] / 255.0) + img[:, :, c] * (img[:, :, 3] / 255.0)
+    
+    
     pil_img = Image.fromarray(cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB))
     draw = ImageDraw.Draw(pil_img)
     draw.text((478, 30), "Time", font=font, fill=(255, 255, 255))
@@ -100,16 +110,13 @@ def disp(result_image,ex_name, L_counter, R_counter, er_1,er_2,er_3,start_time,v
     draw.text((750, 35), "1", font=font2, fill=(255, 255, 255))
     draw.text((845, 35), str(L_counter), font=font2, fill=(255, 255, 255))
     draw.text((970, 35), str(R_counter), font=font2, fill=(255, 255, 255))
-    draw.text((87, 60), str(velo), font=font3, fill=(255, 255, 255))
+    draw.text((87, 60), str(Percent), font=font3, fill=(255, 255, 255))
     # draw.text((330, 1700), str(ex_name), font=font2, fill=(255, 255, 255))
-    draw.text((330, 1700), er_1, font=font2, fill=(255, 255, 255))
-    # cv2.putText(result_image, str(er_3), (50,1650), cv2.FONT_HERSHEY_DUPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
-    # cv2.putText(result_image, str(er_2), (50,1720), cv2.FONT_HERSHEY_DUPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
-    # cv2.putText(result_image, str(er_1), (50,1790), cv2.FONT_HERSHEY_DUPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
-        
+    draw.text((330, 1650), er_1, font=font2, fill=(255, 255, 255))
+    draw.text((330, 1750), er_2, font=font2, fill=(255, 255, 255))
+    draw.text((330, 1850), er_3, font=font2, fill=(255, 255, 255))
 
     draw.text((994, 223), "i", font=font, fill=(255, 255, 255),align='center')
-    
    
     time_str = update_timer(result_image,start_time)        
     draw.text((438, 80), time_str, font=font2, fill=(255, 255, 255))
@@ -117,7 +124,7 @@ def disp(result_image,ex_name, L_counter, R_counter, er_1,er_2,er_3,start_time,v
     
     return result_image
 
-def draw_half_circle_no_round(image,per,pos,radius, color):
+def draw_half_circle_no_round(image,per,pos,radius, out_color,in_color):
 
     # Ellipse parameters
     axes = (radius-5, radius-5)
@@ -128,11 +135,11 @@ def draw_half_circle_no_round(image,per,pos,radius, color):
     thickness = -1
 
     # Draw black half circle
-    cv2.ellipse(image, pos, axes, angle, startAngle, endAngle, (159,162,53), thickness)
-
+    cv2.ellipse(image, pos, axes, angle, startAngle, endAngle, out_color, thickness)
+# (159,162,53)
     axes = (radius - 20, radius - 20)
     # Draw a bit smaller white half circle
-    cv2.ellipse(image, pos, axes, angle, startAngle, endAngle+1, color, thickness)
+    cv2.ellipse(image, pos, axes, angle, startAngle, endAngle+1, in_color, thickness)
 
 def dumbbell_curl(image, stage, R_stage, counter, R_counter,landmarks):
     ex = "Dumbbell curl"
