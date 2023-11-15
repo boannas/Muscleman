@@ -8,10 +8,10 @@ import math
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
 mp_lm = mp_pose.PoseLandmark
-font_path = r"C:\Users\napat\Documents\GitHub\Muscleman\Material\Outfit-Bold.ttf"
-good = cv2.imread(r"C:\Users\napat\Documents\GitHub\Muscleman\image\good.png", cv2.IMREAD_UNCHANGED)
-turtle = cv2.imread(r"C:\Users\napat\Documents\GitHub\Muscleman\image\turtle.png", cv2.IMREAD_UNCHANGED)
-rabbit = cv2.imread(r"C:\Users\napat\Documents\GitHub\Muscleman\image\rabbit.png", cv2.IMREAD_UNCHANGED)
+font_path = r"C:\Users\TADTAWAN\Desktop\work\studio\Outfit-Bold.ttf"
+good = cv2.imread(r"C:\Users\TADTAWAN\Desktop\work\studio\code1\good.png", cv2.IMREAD_UNCHANGED)
+turtle = cv2.imread(r"C:\Users\TADTAWAN\Desktop\work\studio\code1\turtle.png", cv2.IMREAD_UNCHANGED)
+rabbit = cv2.imread(r"C:\Users\TADTAWAN\Desktop\work\studio\code1\rabbit.png", cv2.IMREAD_UNCHANGED)
     # # Draw turtle
 turtle = cv2.resize(turtle, (70, 65))
 good = cv2.resize(good, (55, 55))
@@ -114,7 +114,7 @@ def disp(result_image,ex_name, L_counter, R_counter, er_1,er_2,er_3,start_time,v
     # draw.text((330, 1700), str(ex_name), font=font2, fill=(255, 255, 255))
     draw.text((330, 1650), er_1, font=font2, fill=(255, 255, 255))
     draw.text((330, 1750), er_2, font=font2, fill=(255, 255, 255))
-    draw.text((330, 1850), er_3, font=font2, fill=(255, 255, 255))
+    draw.text((330, 1800), er_3, font=font2, fill=(255, 255, 255))
 
     draw.text((994, 223), "i", font=font, fill=(255, 255, 255),align='center')
    
