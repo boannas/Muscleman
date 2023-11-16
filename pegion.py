@@ -8,15 +8,15 @@ import math
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
 mp_lm = mp_pose.PoseLandmark
+
 font_path = r"C:\Users\TADTAWAN\Desktop\work\studio\Outfit-Bold.ttf"
+
 good = cv2.imread(r"C:\Users\TADTAWAN\Desktop\work\studio\code1\good.png", cv2.IMREAD_UNCHANGED)
 turtle = cv2.imread(r"C:\Users\TADTAWAN\Desktop\work\studio\code1\turtle.png", cv2.IMREAD_UNCHANGED)
 rabbit = cv2.imread(r"C:\Users\TADTAWAN\Desktop\work\studio\code1\rabbit.png", cv2.IMREAD_UNCHANGED)
-    # # Draw turtle
-turtle = cv2.resize(turtle, (70, 65))
+turtle = cv2.resize(turtle, (65, 65))
 good = cv2.resize(good, (55, 55))
 rabbit = cv2.resize(rabbit, (80, 80))
-# Percent = 0
 
 def create_gradient_background(width, height, color1, color2):
     gradient_background = np.zeros((height, width, 3), dtype=np.uint8)
@@ -49,7 +49,9 @@ def update_timer(frame,start_time):
 
 def find_velo(landmarks, start_time, prev_pos, prev_st):
     L_wrist = [landmarks[mp_lm.LEFT_WRIST.value].x,landmarks[mp_lm.LEFT_WRIST.value].y]
-    current = round((time.time() - start_time),1)
+    R_wrist = [landmarks[mp_lm.RIGHT_WRIST.value].x,landmarks[mp_lm.RIGHT_WRIST.value].y]
+    current = int(time.time() - start_time)
+    print(R_wrist[0]*1408,R_wrist[1]*1080,end='\r')
     if current != prev_st :
         # print(current)
         pos_diff_x =  (L_wrist[0] - prev_pos[0]) * 640
@@ -57,7 +59,7 @@ def find_velo(landmarks, start_time, prev_pos, prev_st):
         velo = math.sqrt(pos_diff_x**2 + pos_diff_y**2)
         prev_st = current
         prev_pos = L_wrist
-        # print(prev_pos)
+        
         return round(velo,2), prev_pos, prev_st
 
 def calculate_angle(a,b,c):
@@ -73,24 +75,35 @@ def calculate_angle(a,b,c):
         
     return angle
 
-def disp(result_image,ex_name, L_counter, R_counter, er_1,er_2,er_3,start_time,velo,Percent):
+def disp(result_image,ex_name, L_counter, R_counter, er_1,er_2,er_3,start_time,velo,Percent,stage):
     font = ImageFont.truetype(font_path, size=48)
     font2 = ImageFont.truetype(font_path, size=72)
     font3 = ImageFont.truetype(font_path, size=32)
-
     cv2.circle(result_image,(1000,255),37,(149,131,8),-1)
-    x_position = 290  # Adjust this as needed
-    y_position =37  # Adjust this as needed
-    current = int(time.time() - start_time)
-    if velo > 50 :
-        img = rabbit
-        color_velo = (0,155,255)
-    elif velo <10:
-        img = turtle
-        color_velo = (0,155,255)
+    color_velo = (159,162,53)
+    img = good
+    if stage == "up":
+        if velo > 50 :
+            img = rabbit
+            color_velo = (0,155,255)
+            x_position = 290  # Adjust this as needed
+            y_position =37  # Adjust this as needed
+        elif velo <10:
+            img = turtle
+            color_velo = (0,155,255)
+            x_position = 297  # Adjust this as needed
+            y_position = 45  # Adjust this as needed
+        else :
+            img = good
+            color_velo = (159,162,53)
+            x_position = 300  # Adjust this as needed
+            y_position = 50  # Adjust this as needed
     else :
         img = good
         color_velo = (159,162,53)
+        x_position = 300  # Adjust this as needed
+        y_position = 50  # Adjust this as needed
+
     draw_half_circle_no_round(result_image,100,(330,80),60,color_velo,(97,49,6))
     draw_half_circle_no_round(result_image,Percent,(115,80),60,(159,162,53),(82,25,7))
     height, width, channels = img.shape
@@ -102,16 +115,17 @@ def disp(result_image,ex_name, L_counter, R_counter, er_1,er_2,er_3,start_time,v
     pil_img = Image.fromarray(cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB))
     draw = ImageDraw.Draw(pil_img)
     draw.text((478, 30), "Time", font=font, fill=(255, 255, 255))
-    draw.text((740, 130), "Set", font=font3, fill=(255, 255, 255))
-    draw.text((900, 130), "Rep", font=font3, fill=(255, 255, 255))
+    draw.text((700, 130), "Set", font=font3, fill=(255, 255, 255))
+    draw.text((800, 130), "L Rep", font=font3, fill=(255, 255, 255))
+    draw.text((930, 130), "R Rep", font=font3, fill=(255, 255, 255))
     draw.text((280, 130), "Speed", font=font3, fill=(255, 255, 255))
     draw.text((50, 130), "Accuracy", font=font3, fill=(255, 255, 255))
 
-    draw.text((750, 35), "1", font=font2, fill=(255, 255, 255))
-    draw.text((845, 35), str(L_counter), font=font2, fill=(255, 255, 255))
-    draw.text((970, 35), str(R_counter), font=font2, fill=(255, 255, 255))
+    draw.text((710, 35), "1", font=font2, fill=(255, 255, 255))
+    draw.text((820, 35), str(L_counter), font=font2, fill=(255, 255, 255))
+    draw.text((950, 35), str(R_counter), font=font2, fill=(255, 255, 255))
     draw.text((87, 60), str(Percent), font=font3, fill=(255, 255, 255))
-    # draw.text((330, 1700), str(ex_name), font=font2, fill=(255, 255, 255))
+    draw.text((600, 1500), str(ex_name), font=font2, fill=(255, 255, 255))
     draw.text((330, 1650), er_1, font=font2, fill=(255, 255, 255))
     draw.text((330, 1750), er_2, font=font2, fill=(255, 255, 255))
     draw.text((330, 1800), er_3, font=font2, fill=(255, 255, 255))

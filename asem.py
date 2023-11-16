@@ -52,8 +52,7 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
     
         
         
-        result_image = pg.disp(result_image, ex_name, L_cnt, R_cnt, er_1, er_2, er_3, start_time, velo,Percent=10)
-        # result_image = cv2.resize(result_image,(400,800))
+        result_image = pg.disp(result_image, ex_name, L_cnt, R_cnt, er_1, er_2, er_3, start_time, velo,10,L_stg)
         # Display the frame
         cv2.imshow("Camera Video on Background", result_image)
 
