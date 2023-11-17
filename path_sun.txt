@@ -1,0 +1,5 @@
+font_path = r"C:\Users\TADTAWAN\Desktop\work\studio\Outfit-Bold.ttf"
+
+good = cv2.imread(r"C:\Users\TADTAWAN\Desktop\work\studio\code1\good.png", cv2.IMREAD_UNCHANGED)
+turtle = cv2.imread(r"C:\Users\TADTAWAN\Desktop\work\studio\code1\turtle.png", cv2.IMREAD_UNCHANGED)
+rabbit = cv2.imread(r"C:\Users\TADTAWAN\Desktop\work\studio\code1\rabbit.png", cv2.IMREAD_UNCHANGED)
