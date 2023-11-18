@@ -10,12 +10,20 @@ mp_pose = mp.solutions.pose
 mp_lm = mp_pose.PoseLandmark
 
 # Change path of font and image here kub isus
+<<<<<<< HEAD
 font_path = r"C:\Users\TADTAWAN\Desktop\work\studio\Outfit-Bold.ttf"
 
 good = cv2.imread(r"C:\Users\TADTAWAN\Desktop\work\studio\code1\good.png", cv2.IMREAD_UNCHANGED)
 turtle = cv2.imread(r"C:\Users\TADTAWAN\Desktop\work\studio\code1\turtle.png", cv2.IMREAD_UNCHANGED)
 rabbit = cv2.imread(r"C:\Users\TADTAWAN\Desktop\work\studio\code1\rabbit.png", cv2.IMREAD_UNCHANGED)
 
+=======
+font_path = r"C:\Users\napat\Documents\GitHub\Muscleman\Material\Outfit-Bold.ttf"
+good = cv2.imread(r"C:\Users\napat\Documents\GitHub\Muscleman\image\good.png", cv2.IMREAD_UNCHANGED)
+turtle = cv2.imread(r"C:\Users\napat\Documents\GitHub\Muscleman\image\turtle.png", cv2.IMREAD_UNCHANGED)
+rabbit = cv2.imread(r"C:\Users\napat\Documents\GitHub\Muscleman\image\rabbit.png", cv2.IMREAD_UNCHANGED)
+
+>>>>>>> 37eadc6b41f4ad54c85d27437379831b26580c03
 turtle = cv2.resize(turtle, (65, 65))
 good = cv2.resize(good, (55, 55))
 rabbit = cv2.resize(rabbit, (80, 80))
@@ -125,6 +133,7 @@ def accuracy(L_shoulder, R_shoulder, angle_L_body, angle_R_body):
     left = round(R_shoulder[0],2)*100
     angle_L = round(angle_L_body,2)
     angle_R = round(angle_R_body,2)
+<<<<<<< HEAD
     print("right  = ",right," Left  = ",left)
     print("AngleL  = ",angle_L," AngleR = ",angle_R)
     
@@ -141,6 +150,20 @@ def accuracy(L_shoulder, R_shoulder, angle_L_body, angle_R_body):
     if abs(compare_mean) < 1.0 and angle_L < 30.0 and angle_R < 30.0:
         score_accuracy = 100
     print(score_accuracy, end='\r')
+=======
+    compare_mean = abs((left - right) / 2)
+    if abs(compare_mean) > 1.5 or angle_L > 20.0 or angle_R > 20.0:
+        score_accuracy = 80
+    if abs(compare_mean) > 3.0 or angle_L > 25.0 or angle_R > 25.0:
+        score_accuracy = 60
+    if abs(compare_mean) > 4.0 or angle_L > 27.0 or angle_R > 27.0:
+        score_accuracy = 40
+    if abs(compare_mean) > 5.0 or angle_L > 30.0 or angle_R > 30.0:
+        score_accuracy = 0
+    if abs(compare_mean) < 1.5 and angle_L < 20.0 and angle_R > 20.0:
+        score_accuracy = 100
+    # print(score_accuracy)
+>>>>>>> 37eadc6b41f4ad54c85d27437379831b26580c03
     return score_accuracy
   
 def disp(result_image,ex_name, L_counter, R_counter, er_1, er_2, er_3, start_time, velo, R_velo, Percent):

@@ -58,7 +58,11 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
         
         result_image, L_cnt, R_cnt = pg.disp(result_image, ex_name, L_cnt, R_cnt, er_1, er_2, er_3, start_time, velo, velo_R, acc)
         # Display the frame
+<<<<<<< HEAD
         # result_image = cv2.resize(result_image,(result_image.shape[1]//2,result_image.shape[0]//2))
+=======
+        result_image = cv2.resize(result_image,(result_image.shape[1]//2,result_image.shape[0]//2))
+>>>>>>> 37eadc6b41f4ad54c85d27437379831b26580c03
         cv2.imshow("Muscle man", result_image)
 
         if cv2.waitKey(1) & 0xFF == 27:  # Press 'Esc' to exit
