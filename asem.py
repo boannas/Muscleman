@@ -14,8 +14,8 @@ vel_l, vel_r = [], []
 
 # Create a gradient background
 background = pg.create_gradient_background(1080, 1920, (45, 45, 45),(45, 45, 45))
-result_image = pg.create_gradient_rectangle_on_background(background,
-                        0, 0, 1080, 200, (7, 25, 82), (8, 131, 149))
+# result_image = pg.create_gradient_rectangle_on_background(background,
+#                         0, 0, 1080, 200, (7, 25, 82), (8, 131, 149))
 
 # Zoomer configuration
 cap = cv2.VideoCapture(0)
@@ -52,17 +52,13 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                                 mp_drawing.DrawingSpec(color=(255,0,0), thickness=2, circle_radius=2), 
                                 mp_drawing.DrawingSpec(color=(255,216,0), thickness=2, circle_radius=2))
         image = cv2.flip(cv2.rotate(cv2.resize(image,(1408,1080)),cv2.ROTATE_90_COUNTERCLOCKWISE),1)
-        result_image = pg.overlay_image(background.copy(), image, 0, 200)
+        result_image = pg.overlay_image(background.copy(), image, 0, 80)
     
         
         
         result_image, L_cnt, R_cnt = pg.disp(result_image, ex_name, L_cnt, R_cnt, er_1, er_2, er_3, start_time, velo, velo_R, acc)
         # Display the frame
-<<<<<<< HEAD
         # result_image = cv2.resize(result_image,(result_image.shape[1]//2,result_image.shape[0]//2))
-=======
-        result_image = cv2.resize(result_image,(result_image.shape[1]//2,result_image.shape[0]//2))
->>>>>>> 37eadc6b41f4ad54c85d27437379831b26580c03
         cv2.imshow("Muscle man", result_image)
 
         if cv2.waitKey(1) & 0xFF == 27:  # Press 'Esc' to exit
