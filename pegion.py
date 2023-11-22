@@ -3,7 +3,6 @@ import mediapipe as mp
 import numpy as np
 import time
 from PIL import ImageFont, ImageDraw, Image
-import math
 
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
@@ -11,13 +10,19 @@ mp_lm = mp_pose.PoseLandmark
 
 # Change path of font and image here kub isus
 font_path = r"C:\Users\napat\Documents\GitHub\Muscleman\Material\Outfit-Bold.ttf"
-good = cv2.imread(r"C:\Users\napat\Documents\GitHub\Muscleman\image\good.png", cv2.IMREAD_UNCHANGED)
-turtle = cv2.imread(r"C:\Users\napat\Documents\GitHub\Muscleman\image\turtle.png", cv2.IMREAD_UNCHANGED)
-rabbit = cv2.imread(r"C:\Users\napat\Documents\GitHub\Muscleman\image\rabbit.png", cv2.IMREAD_UNCHANGED)
+font_pathReg = r"C:\Users\napat\Documents\GitHub\Muscleman\Material\Outfit-Regular.ttf"
+font = ImageFont.truetype(font_path, size=48)
+font2 = ImageFont.truetype(font_path, size=72)
+font3 = ImageFont.truetype(font_pathReg, size=32)
+font4 = ImageFont.truetype(font_pathReg, size=40)
 
-turtle = cv2.resize(turtle, (65, 65))
-good = cv2.resize(good, (55, 55))
-rabbit = cv2.resize(rabbit, (80, 80))
+# good = cv2.imread(r"C:\Users\napat\Documents\GitHub\Muscleman\image\good.png", cv2.IMREAD_UNCHANGED)
+# turtle = cv2.imread(r"C:\Users\napat\Documents\GitHub\Muscleman\image\turtle.png", cv2.IMREAD_UNCHANGED)
+# rabbit = cv2.imread(r"C:\Users\napat\Documents\GitHub\Muscleman\image\rabbit.png", cv2.IMREAD_UNCHANGED)
+
+# turtle = cv2.resize(turtle, (65, 65))
+# good = cv2.resize(good, (55, 55))
+# rabbit = cv2.resize(rabbit, (80, 80))
 
 buttons = [
 (600, 1500, 500, 100, "Button 1"),
@@ -69,7 +74,7 @@ def find_velo(landmarks, start_time, prev_pos, prev_pos_R, prev_st,velo_list, ve
     #     prev_pos = L_wrist
         
     #     return round(velo,2), prev_pos, prev_st
-    L_shoulder = [landmarks[mp_lm.LEFT_SHOULDER.value].x,landmarks[mp_lm.LEFT_SHOULDER.value].y]
+    L_shoulder = [landmarks[mp_lm  .LEFT_SHOULDER.value].x,landmarks[mp_lm.LEFT_SHOULDER.value].y]
     L_elbow = [landmarks[mp_lm.LEFT_ELBOW.value].x,landmarks[mp_lm.LEFT_ELBOW.value].y]
     L_wrist = [landmarks[mp_lm.LEFT_WRIST.value].x,landmarks[mp_lm.LEFT_WRIST.value].y]
     
@@ -138,77 +143,120 @@ def accuracy(L_shoulder, R_shoulder, angle_L_body, angle_R_body):
     # print(score_accuracy)
     return score_accuracy
   
-def disp(result_image,ex_name, L_counter, R_counter, er_1, er_2, er_3, start_time, velo, R_velo, Percent):
-    font = ImageFont.truetype(font_path, size=48)
-    font2 = ImageFont.truetype(font_path, size=72)
-    font3 = ImageFont.truetype(font_path, size=32)
-    color_velo = (159,162,53)
-    img = good
+def disp(result_image, ex_name, L_counter, R_counter, er_1, er_2, er_3, start_time, Percent, time_L, time_R,prev, cnt, last_time, img, color_velo, x_position, y_position, sp):
 
-    
-    cv2.circle(result_image,(1000,255),37,(149,131,8),-1)
-    # if stage == "up":
-    if velo > 20 or R_velo > 20:
-        img = rabbit
-        color_velo = (0,155,255)
-        x_position = 290  # Adjust this as needed
-        y_position =37  # Adjust this as needed
-    elif velo < 10 and velo > 5 or R_velo < 10 and R_velo >5:
-        img = turtle
-        color_velo = (0,155,255)
-        x_position = 297  # Adjust this as needed
-        y_position = 45  # Adjust this as needed
-    else :
-        img = good
-        color_velo = (159,162,53)
-        x_position = 300  # Adjust this as needed
-        y_position = 50  # Adjust this as needed
+    current_time = time.time()
+    if (current_time - last_time) >= 2 :
+        # print(current_time - last_time)
+        print(time_R)
+        if (time_L < 0.18 and time_L != 0) or (time_R < 0.18 and time_R != 0):
+            sp = "Too Fast"
+            last_time = time.time() 
+        elif time_L > 0.4 or time_R > 0.4:
+            sp = "Too Slow"
+            last_time = time.time() 
+        else :
+            sp = ""
+    top_left_x = 0  # Change as needed
+    top_left_y = 900  # Change as needed
+    bottom_right_x = 75  # Change as needed
+    bottom_right_y = 1110  # Change as needed
 
-    draw_half_circle_no_round(result_image,100,(330,80),60,color_velo,(97,49,6))
-    draw_half_circle_no_round(result_image,Percent,(115,80),60,(159,162,53),(82,25,7))
+    # Define the color (BGR format) and thickness
+    rectangle_color = (0, 0, 0)  
+    error = (68,49,190) 
+    ER = 0.9    
+ 
+    overlay = result_image.copy()
+
+    cv2.rectangle(overlay, (top_left_x, top_left_y), (bottom_right_x, bottom_right_y), rectangle_color, 100)
+    if er_1 != "":
+        cv2.rectangle(overlay, (30, 480), (390, 530),error, 50)
+    if er_2 != "":    
+        cv2.rectangle(overlay, (30, 590), (410, 640),error, 50)
+    elif sp != "" and er_1 == "" and er_2 == "":
+        cv2.rectangle(overlay, (30, 370), (390, 420),error, 50)
     
-    height, width, channels = img.shape
-    roi = result_image[y_position:y_position+height, x_position:x_position+width]
-    for c in range(0, 3):
-        roi[:, :, c] = roi[:, :, c] * (1 - img[:, :, 3] / 255.0) + img[:, :, c] * (img[:, :, 3] / 255.0)
+    if er_3 != "":
+        cv2.rectangle(overlay, (30, 700), (410, 750),error, 50)
+   
+    cv2.addWeighted(overlay, ER, result_image, 1 - ER, 0, result_image)
+    cv2.rectangle(result_image, (0, 1476), (1080, 1920), (45,45,45), 100)
+    cv2.circle(result_image,(420,1480),30,(255,255,255),3)
+    cv2.rectangle(result_image, (100, 1635), (900, 1635), (161,247,242), 70)
+    cv2.rectangle(result_image, (100, 1635), (900, 1635), (45,45,45), 60)
+    cv2.rectangle(result_image, (100, 1730), (900, 1730), (161,247,242), 70)
+    cv2.rectangle(result_image, (460, 125), (620, 160), (0,0,0), 100)
     
-    for button in buttons:
-        button_x, button_y, button_width, button_height, _ = button
-        cv2.rectangle(result_image, (button_x, button_y), (button_x + button_width, button_y + button_height), (149, 131, 8), -1)
-    if buttons_clicked:
-        # print(buttons_clicked)
-        if buttons_clicked == {'Button 1'}:
-            L_counter = 0
-            R_counter = 0
-        # if buttons_clicked == {'Button 2'}:
-        #     R_counter = 0
-        buttons_clicked.clear()
+    # draw_half_circle_no_round(result_image,100,(330,80),60,color_velo,(97,49,6))
+    # draw_half_circle_no_round(result_image,Percent,(115,80),60,(159,162,53),(82,25,7))
+     
+    # height, width, channels = img.shape
+    # roi = result_image[y_position:y_position+height, x_position:x_position+width]
+    # for c in range(0, 3):
+    #     roi[:, :, c] = roi[:, :, c] * (1 - img[:, :, 3] / 255.0) + img[:, :, c] * (img[:, :, 3] / 255.0)
+    
+    # for button in buttons:
+    #     button_x, button_y, button_width, button_height, _ = button
+    #     cv2.rectangle(result_image, (button_x, button_y), (button_x + button_width, button_y + button_height), (149, 131, 8), -1)
+    # if buttons_clicked:
+    #     # print(buttons_clicked)
+    #     if buttons_clicked == {'Button 1'}:
+    #         L_counter = 0
+    #         R_counter = 0
+    #     # if buttons_clicked == {'Button 2'}:
+    #     #     R_counter = 0
+    #     buttons_clicked.clear()
         
+    # pil_img = Image.fromarray(cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB))
+    # draw = ImageDraw.Draw(pil_img)
+    # draw.text((478, 30), "Time", font=font, fill=(255, 255, 255))
+    # draw.text((700, 130), "Set", font=font3, fill=(255, 255, 255))
+    # draw.text((800, 130), "L Rep", font=font3, fill=(255, 255, 255))
+    # draw.text((930, 130), "R Rep", font=font3, fill=(255, 255, 255))
+    # draw.text((280, 130), "Speed", font=font3, fill=(255, 255, 255))
+    # draw.text((50, 130), "Accuracy", font=font3, fill=(255, 255, 255))
+
+    # draw.text((710, 35), "1", font=font2, fill=(255, 255, 255))
+    # draw.text((820, 35), str(L_counter), font=font2, fill=(255, 255, 255))
+    # draw.text((950, 35), str(R_counter), font=font2, fill=(255, 255, 255))
+    # draw.text((87, 60), str(Percent), font=font3, fill=(255, 255, 255))
+    # draw.text((600, 1500), str(ex_name), font=font2, fill=(255, 255, 255))
+    # draw.text((80, 1640), str(time_L), font=font2, fill=(255, 255, 255))
+    # draw.text((80, 1720), str(time_R), font=font2, fill=(255, 255, 255))
+    # draw.text((80, 1800), er_3, font=font2, fill=(255, 255, 255))
+
+    # draw.text((994, 223), "i", font=font, fill=(255, 255, 255),align='center')
     pil_img = Image.fromarray(cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB))
     draw = ImageDraw.Draw(pil_img)
-    draw.text((478, 30), "Time", font=font, fill=(255, 255, 255))
-    draw.text((700, 130), "Set", font=font3, fill=(255, 255, 255))
-    draw.text((800, 130), "L Rep", font=font3, fill=(255, 255, 255))
-    draw.text((930, 130), "R Rep", font=font3, fill=(255, 255, 255))
-    draw.text((280, 130), "Speed", font=font3, fill=(255, 255, 255))
-    draw.text((50, 130), "Accuracy", font=font3, fill=(255, 255, 255))
+    draw.text((478, 80), "Time", font=font, fill=(255, 255, 255))
+    draw.text((25, 900), "Set", font=font3, fill=(255, 255, 255))
+    draw.text((20, 1000), "L Rep", font=font3, fill=(255, 255, 255))
+    draw.text((20, 1100), "R Rep", font=font3, fill=(255, 255, 255))
+    # # draw.text((280, 130), "Speed", font=font3, fill=(255, 255, 255))
+    # # draw.text((50, 130), "Accuracy", font=font3, fill=(255, 255, 255))
+    if sp != "" and er_1 == "" and er_2 == "":
+        draw.text((20, 370), sp, font=font4, fill=(255, 255, 255))
 
-    draw.text((710, 35), "1", font=font2, fill=(255, 255, 255))
-    draw.text((820, 35), str(L_counter), font=font2, fill=(255, 255, 255))
-    draw.text((950, 35), str(R_counter), font=font2, fill=(255, 255, 255))
-    draw.text((87, 60), str(Percent), font=font3, fill=(255, 255, 255))
-    draw.text((600, 1500), str(ex_name), font=font2, fill=(255, 255, 255))
-    draw.text((80, 1640), er_1, font=font2, fill=(255, 255, 255))
-    draw.text((80, 1720), er_2, font=font2, fill=(255, 255, 255))
-    draw.text((80, 1800), er_3, font=font2, fill=(255, 255, 255))
-
-    draw.text((994, 223), "i", font=font, fill=(255, 255, 255),align='center')
-   
+    draw.text((40, 850), "1", font=font, fill=(255, 255, 255))
+    draw.text((40, 950), str(L_counter), font=font, fill=(255, 255, 255))
+    draw.text((40, 1050),str(R_counter), font=font, fill=(255, 255, 255))
+    # draw.text((95, 60),  str(Percent), font=font, fill=(255, 255, 255))
+    draw.text((64, 1450), str(ex_name), font=font, fill=(255, 255, 255))
+    draw.text((20, 480), er_1, font=font4, fill=(255, 255, 255))
+    draw.text((20, 590), er_2, font=font4, fill=(255, 255, 255))
+    draw.text((20, 700), er_3, font=font4, fill=(255, 255, 255))
+    draw.text((415, 1450), "i", font=font, fill=(255, 255, 255),align='center')
+    draw.text((415, 1605), "PAUSE", font=font, fill=(255, 255, 255))
+    draw.text((415, 1700), "FINISH", font=font, fill=(45, 45, 45))
     time_str = update_timer(result_image,start_time)        
-    draw.text((438, 80), time_str, font=font2, fill=(255, 255, 255))
+    draw.text((438, 130), time_str, font=font2, fill=(255, 255, 255))
     result_image = cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
+    time_str = update_timer(result_image,start_time)        
+    # draw.text((438, 80), time_str, font=font2, fill=(255, 255, 255))
+    # result_image = cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
     
-    return result_image, L_counter, R_counter
+    return result_image, L_counter, R_counter, prev, cnt, last_time,img, color_velo, x_position, y_position, sp
 
 def draw_half_circle_no_round(image,per,pos,radius, out_color,in_color):
 
@@ -227,7 +275,29 @@ def draw_half_circle_no_round(image,per,pos,radius, out_color,in_color):
     # Draw a bit smaller white half circle
     cv2.ellipse(image, pos, axes, angle, startAngle, endAngle+1, in_color, thickness)
 
-def dumbbell_curl(image, stage, R_stage, counter, R_counter,landmarks):
+def calibrate(landmarks, time_ref) :
+    nose = [landmarks[mp_lm.NOSE.value].x,landmarks[mp_lm.NOSE.value].y]
+    current_time = time.time()
+    if (current_time - time_ref) >= 0.5 :
+        if nose[0] > 0.75 :
+            cali_1 = "Go back"
+        elif nose[0] < 0.7 :
+            cali_1 = "Go forward"
+        else :
+            cali_1 = "Ok isus"
+        if nose[1] > 0.45 and nose[1] < 0.55 :
+            cali_2 = "KO"
+        elif nose[1] < 0.45 :
+            cali_2 = "Slide Left"
+        else :
+            cali_2 = "Slide Right"
+        time_ref = time.time()
+    return time_ref, cali_1, cali_2
+    
+    
+    
+def dumbbell_curl(image, stage, R_stage, counter, R_counter,landmarks,time_temp, time_temp_R):
+    time_out, time_out_R = 0,0
     ex = "Dumbbell curl"
     # Left parts
     L_shoulder = [landmarks[mp_lm.LEFT_SHOULDER.value].x,landmarks[mp_lm.LEFT_SHOULDER.value].y]
@@ -241,9 +311,10 @@ def dumbbell_curl(image, stage, R_stage, counter, R_counter,landmarks):
     R_wrist = [landmarks[mp_lm.RIGHT_WRIST.value].x,landmarks[mp_lm.RIGHT_WRIST.value].y]
     R_hip = [landmarks[mp_lm.RIGHT_HIP.value].x,landmarks[mp_lm.RIGHT_HIP.value].y]
     
+    
     # Different of shoulder pos Y
     dif_shoulder = (L_shoulder[0] - R_shoulder[0]) *100
-
+    
     # Calculate angle
     angle_L_arm = calculate_angle(L_shoulder, L_elbow, L_wrist)
     angle_L_body = calculate_angle(L_elbow,L_shoulder,L_hip)
@@ -251,43 +322,50 @@ def dumbbell_curl(image, stage, R_stage, counter, R_counter,landmarks):
     angle_R_body = calculate_angle(R_elbow,R_shoulder,R_hip)
     acc = (accuracy(L_shoulder, R_shoulder, angle_L_body, angle_R_body))
     if abs(dif_shoulder) < 2:
-        e3 = "Neutral"
+        e3 = ""
         
     elif dif_shoulder > 0 :
-        e3 = "Please stand strait"
+        e3 = "Please stand straight"
         cv2.line(image,tuple(np.multiply(L_shoulder, [1024, 768]).astype(int)),
                  tuple(np.multiply(R_shoulder, [1024, 768]).astype(int)),(0,155,255),10)
         # cv2.circle()
     else :
         cv2.line(image,tuple(np.multiply(L_shoulder, [1024, 768]).astype(int)),
                  tuple(np.multiply(R_shoulder, [1024, 768]).astype(int)),(0,155,255),10)
-        e3 = "Please stand strait"
+        e3 = "! Please stand straight"
         
         
     if angle_L_body > 30:
-        e1 = "Close your Left Arm"
+        e1 = "! Close your Left Arm"
         cv2.circle(image,tuple(np.multiply(L_shoulder, [1024, 768]).astype(int)),8,(0,0,255),15)
     else :
         e1 = ""        
         
     if angle_R_body > 30:
-        e2 = "Close your Right Arm"
+        e2 = "! Close your Right Arm"
         cv2.circle(image,tuple(np.multiply(R_shoulder, [1024, 768]).astype(int)),8,(0,0,255),15)
     else :
         e2 = ""
         
-    if angle_L_arm > 160:
+    if angle_L_arm > 165:
         stage = "down"
+        time_temp = time.time()
+        # print(time_temp,end='\r')
     elif angle_L_arm < 30 and stage =='down':
         stage="up"
+        time_out = time.time() - time_temp
+        # print(time_out,end='\r')
         counter +=1
                 
-    if angle_R_arm > 160:
+    if angle_R_arm > 165:
         R_stage = "R_down"
+        time_temp_R = time.time()
     elif angle_R_arm < 30 and R_stage =='R_down':
         R_stage="R_up"
+        time_out_R = time.time() - time_temp_R
+        # print(time_out_R,end='\r')
         R_counter +=1
-    return counter, R_counter, e1, e2, e3, stage, R_stage, ex, acc
+    return counter, R_counter, e1, e2, e3, stage, R_stage, ex, acc, time_temp, time_temp_R, time_out, time_out_R
 
 def lateral_raises(image, stage, R_stage, counter, R_counter,landmarks):
 
