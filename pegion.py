@@ -19,13 +19,6 @@ mp_lm = mp_pose.PoseLandmark
 font_path = r"C:\Users\TADTAWAN\Desktop\work\studio\Outfit-Bold.ttf"
 font_pathReg = r"C:\Users\TADTAWAN\Desktop\work\studio\Outfit-Regular.ttf"
 
-good = cv2.imread(r"C:\Users\TADTAWAN\Desktop\work\studio\code1\good.png", cv2.IMREAD_UNCHANGED)
-turtle = cv2.imread(r"C:\Users\TADTAWAN\Desktop\work\studio\code1\turtle.png", cv2.IMREAD_UNCHANGED)
-rabbit = cv2.imread(r"C:\Users\TADTAWAN\Desktop\work\studio\code1\rabbit.png", cv2.IMREAD_UNCHANGED)
-
-turtle = cv2.resize(turtle, (65, 65))
-good = cv2.resize(good, (55, 55))
-rabbit = cv2.resize(rabbit, (80, 80))
 
 buttons = [
 (600, 1500, 500, 100, "Button 1"),
@@ -195,15 +188,19 @@ def disp(result_image,ex_name, L_counter, R_counter, er_1, er_2, er_3, start_tim
     overlay = result_image.copy()
 
     cv2.rectangle(overlay, (top_left_x, top_left_y), (bottom_right_x, bottom_right_y), rectangle_color, 100)
-    cv2.rectangle(overlay, (30, 500), (370, 520),error, 50)
-    cv2.rectangle(overlay, (30, 580), (390, 600),error, 50)
-    cv2.rectangle(overlay, (30, 660), (340, 700),error, 50)
+    if er_1 != "":
+        cv2.rectangle(overlay, (30, 480), (390, 530),error, 50)
+    if er_2 != "":    
+        cv2.rectangle(overlay, (30, 590), (410, 640),error, 50)
+    if er_3 != "":
+        cv2.rectangle(overlay, (30, 700), (410, 750),error, 50)
     cv2.addWeighted(overlay, ER, result_image, 1 - ER, 0, result_image)
     cv2.rectangle(result_image, (0, 1476), (1080, 1920), (45,45,45), 100)
     cv2.circle(result_image,(420,1480),30,(255,255,255),3)
     cv2.rectangle(result_image, (100, 1635), (900, 1635), (161,247,242), 70)
     cv2.rectangle(result_image, (100, 1635), (900, 1635), (45,45,45), 60)
     cv2.rectangle(result_image, (100, 1730), (900, 1730), (161,247,242), 70)
+    cv2.rectangle(result_image, (460, 125), (620, 160), (0,0,0), 100)
     # # if stage == "up":
     # if velo > 20 or R_velo > 20:
     #     img = rabbit
@@ -247,17 +244,17 @@ def disp(result_image,ex_name, L_counter, R_counter, er_1, er_2, er_3, start_tim
     draw.text((25, 900), "Set", font=font3, fill=(255, 255, 255))
     draw.text((20, 1000), "L Rep", font=font3, fill=(255, 255, 255))
     draw.text((20, 1100), "R Rep", font=font3, fill=(255, 255, 255))
-    # draw.text((280, 130), "Speed", font=font3, fill=(255, 255, 255))
-    # draw.text((50, 130), "Accuracy", font=font3, fill=(255, 255, 255))
+    # # draw.text((280, 130), "Speed", font=font3, fill=(255, 255, 255))
+    # # draw.text((50, 130), "Accuracy", font=font3, fill=(255, 255, 255))
 
     draw.text((40, 850), "1", font=font, fill=(255, 255, 255))
     draw.text((40, 950), str(L_counter), font=font, fill=(255, 255, 255))
     draw.text((40, 1050),str(R_counter), font=font, fill=(255, 255, 255))
     # draw.text((95, 60),  str(Percent), font=font, fill=(255, 255, 255))
     draw.text((64, 1450), str(ex_name), font=font, fill=(255, 255, 255))
-    draw.text((20, 475), er_1, font=font4, fill=(255, 255, 255))
-    draw.text((20, 555), er_2, font=font4, fill=(255, 255, 255))
-    draw.text((20, 635), er_3, font=font4, fill=(255, 255, 255))
+    draw.text((20, 480), er_1, font=font4, fill=(255, 255, 255))
+    draw.text((20, 590), er_2, font=font4, fill=(255, 255, 255))
+    draw.text((20, 700), er_3, font=font4, fill=(255, 255, 255))
     draw.text((415, 1450), "i", font=font, fill=(255, 255, 255),align='center')
     draw.text((415, 1600), "PAUSE", font=font, fill=(255, 255, 255))
     draw.text((415, 1700), "FINISH", font=font, fill=(45, 45, 45))
@@ -302,29 +299,29 @@ def dumbbell_curl(image, stage, R_stage, counter, R_counter,landmarks):
     angle_R_arm = calculate_angle(R_shoulder,R_elbow,R_wrist)
     angle_R_body = calculate_angle(R_elbow,R_shoulder,R_hip)
     acc = (accuracy(L_shoulder, R_shoulder, angle_L_body, angle_R_body))
-    if abs(dif_shoulder) < 2:
-        e3 = "Neutral"
+    
         
-    elif dif_shoulder > 0 :
-        e3 = "Please stand strait"
+    if dif_shoulder > 0 :
+        e3 = "! Please stand straight"
         cv2.line(image,tuple(np.multiply(L_shoulder, [1024, 768]).astype(int)),
                  tuple(np.multiply(R_shoulder, [1024, 768]).astype(int)),(0,155,255),10)
         # cv2.circle()
     else :
         cv2.line(image,tuple(np.multiply(L_shoulder, [1024, 768]).astype(int)),
                  tuple(np.multiply(R_shoulder, [1024, 768]).astype(int)),(0,155,255),10)
-        e3 = "Please stand strait"
+        e3 = ""
         
         
     if angle_L_body > 30:
-        e1 = "Close your Left Arm"
+        e1 = "! Close your Left Arm"
         cv2.circle(image,tuple(np.multiply(L_shoulder, [1024, 768]).astype(int)),8,(0,0,255),15)
     else :
         e1 = ""        
         
     if angle_R_body > 30:
-        e2 = "Close your Right Arm"
+        e2 = "! Close your Right Arm"
         cv2.circle(image,tuple(np.multiply(R_shoulder, [1024, 768]).astype(int)),8,(0,0,255),15)
+        
     else :
         e2 = ""
         

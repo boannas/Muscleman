@@ -44,7 +44,7 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
 
             # Result from ex function
             L_cnt, R_cnt, er_1, er_2, er_3, L_stg, R_stg, ex_name, acc = pg.dumbbell_curl(image,L_stg, R_stg, L_cnt, R_cnt, landmarks)
-            velo, velo_R, prev_pos, prev_pos_R, prev_st, vel_l, vel_r = pg.find_velo(landmarks, start_time, prev_pos, prev_pos_R, prev_st, vel_l, vel_r)
+            # velo, velo_R, prev_pos, prev_pos_R, prev_st, vel_l, vel_r = pg.find_velo(landmarks, start_time, prev_pos, prev_pos_R, prev_st, vel_l, vel_r)
         except:
             pass
         
